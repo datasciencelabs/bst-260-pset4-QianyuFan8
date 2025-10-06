@@ -74,7 +74,6 @@ resp_content_type(response)
 
 ```{r}
 population <- resp_body_json(response, simplifyVector = TRUE)
-head(population)
 ```
 
 6.  Examine the `population` matrix you just created. Notice that 1) it is not tidy, 2) the column types are not what we want, and 3) the first row is a header. Convert `population` to a tidy dataset. Remove the state ID column and change the name of the column with state names to `state_name`. Add a column with state abbreviations called `state`. Make sure you assign the abbreviations for DC and PR correctly. Hint: Use the **janitor** package to make the first row the header.
@@ -107,7 +106,6 @@ population <- population |>
            state_name == "District of Columbia" ~ "DC",
            state_name == "Puerto Rico" ~ "PR",
            TRUE ~ state))
-population
 ```
 
 7.  As a check, make a barplot of states' 2021 and 2022 populations. Show the state names in the y-axis ordered by population size. Hint: You will need to use `reorder` and use `facet_wrap`.
@@ -159,14 +157,12 @@ regions <- fromJSON(url) |>
            "NY, NJ, PR, VI")) |>
   # Filter state
   filter(state_name %in% c(state.name, "District of Columbia", "Puerto Rico")) 
-regions
 ```
 
 9.  Add a region and region name columns to the `population` data frame.
 
 ```{r}
 population <- left_join(population, regions, by="state_name")
-population
 ```
 
 10. From reading <https://data.cdc.gov/> we learn the endpoint `https://data.cdc.gov/resource/pwn4-m3yp.json` provides state level data from SARS-COV2 cases. Use the **httr2** tools you have learned to download this into a data frame. Is all the data there? If not, comment on why.
@@ -177,7 +173,6 @@ cases_raw <- request(api) |>
   req_perform() |>
   resp_body_json(simplifyDataFrame = TRUE) |>
   as_tibble()
-cases_raw
 ```
 
 We see exactly 1,000 rows. We should be seeing over $52 \times 3$ rows per state.
@@ -201,7 +196,6 @@ cases <- cases_raw |>
   mutate(cases = as.numeric(cases), date = as.Date(date)) |>
   # Filter only has states, DC, and PR as well as NA
   filter(state %in% c(state.abb, "DC", "PR"), !is.na(date), !is.na(cases))
-cases
 ```
 
 12. For 2020 and 2021, make a time series plot of cases per 100,000 versus time for each state. Stratify the plot by region name. Make sure to label you graph appropriately.
@@ -281,7 +275,6 @@ deaths <- deaths_raw |>
   # Filter state and NA
   filter(state %in% c(state.name, "District of Columbia", "Puerto Rico"),
          !is.na(deaths), !is.na(date))
-deaths
 ```
 
 15. Using the `deaths` dataset you created, make a bar plot showing the total COVID-19 deaths by state. Show only the top 10 states with the highest death counts. Order the bars from highest to lowest and use appropriate labels and title.
